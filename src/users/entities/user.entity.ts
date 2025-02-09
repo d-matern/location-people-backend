@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Point, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -16,4 +16,12 @@ export class User {
 
   @Column()
   age: number;
+
+  @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+    default: () => `ST_GeomFromText('POINT(0 0)', 4326)`,
+  })
+  location: Point;
 }

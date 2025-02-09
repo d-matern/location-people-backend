@@ -3,6 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
+import { LocationModule } from './location/location.module';
+import { UsersModule } from './users/users.module';
+import { WebSocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -15,6 +18,9 @@ import { User } from './users/entities/user.entity';
     }),
     TypeOrmModule.forFeature([User]),
     AuthModule,
+    UsersModule,
+    LocationModule,
+    WebSocketModule,
   ],
 })
 export class AppModule {}

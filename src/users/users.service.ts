@@ -26,7 +26,6 @@ export class UsersService {
 
   async getProfile(id: number) {
     const profile = await this.userRepository.findOneBy({ id });
-
     if (!profile) {
       throw new BadRequestException();
     }
