@@ -27,7 +27,11 @@ export class LocationService {
   async getNearbyUsers(userId: number, radius: number = 5000) {
     return this.userRepository.query(
       `
-        SELECT id, username, 
+        SELECT
+        id, 
+        username, 
+        avatar, 
+        age, 
         ST_X(location::geometry) as lng, 
         ST_Y(location::geometry) as lat
         FROM users
