@@ -13,7 +13,7 @@ import { WebSocketModule } from './websocket/websocket.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      migrations: ['dist/migrations/*.js'],
+      migrations: ['dist/src/migrations/*.js'],
       entities: [User],
       synchronize: false,
       logging: true,
