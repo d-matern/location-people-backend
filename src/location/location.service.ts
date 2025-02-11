@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { LocationDto } from './dto/location.dto';
+import { LocationDetectDto } from './dto/location.dto';
 
 @Injectable()
 export class LocationService {
@@ -11,7 +11,7 @@ export class LocationService {
     private userRepository: Repository<User>,
   ) {}
 
-  updateUserLocation(data: LocationDto) {
+  updateUserLocation(data: LocationDetectDto) {
     const { userId, lng, lat } = data;
     return this.userRepository
       .createQueryBuilder()
@@ -34,10 +34,12 @@ export class LocationService {
             ELSE EXTRACT(YEAR FROM AGE("birthDate")) 
           END AS age, 
           ST_X(location::geometry) as lng, 
-          ST_Y(location::geometry) as lat 
+          ST_Y(location::geometry) as lat, 
+          ST_Distance(location::geography, (SELECT location::geography FROM users WHERE id = $1)) AS distance
         FROM users 
         WHERE id != $1 
-        AND ST_DWithin(location, (SELECT location FROM users WHERE id = $1), $2);
+        AND ST_DWithin(location, (SELECT location FROM users WHERE id = $1), $2) 
+        ORDER BY distance;
       `,
       [userId, radius],
     );
