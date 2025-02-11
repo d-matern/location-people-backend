@@ -25,20 +25,29 @@ export class LocationService {
   }
 
   async getNearbyUsers(userId: number, radius: number = 5000) {
-    return this.userRepository.query(
+    const result = await this.userRepository.query(
       `
-        SELECT
-        id, 
-        username, 
-        avatar, 
-        age, 
-        ST_X(location::geometry) as lng, 
-        ST_Y(location::geometry) as lat
-        FROM users
-        WHERE id != $1
+        SELECT 
+          *, 
+          CASE 
+            WHEN "birthDate" IS NULL THEN 0 
+            ELSE EXTRACT(YEAR FROM AGE("birthDate")) 
+          END AS age, 
+          ST_X(location::geometry) as lng, 
+          ST_Y(location::geometry) as lat 
+        FROM users 
+        WHERE id != $1 
         AND ST_DWithin(location, (SELECT location FROM users WHERE id = $1), $2);
       `,
       [userId, radius],
     );
+
+    const payload = result.map((r: User) => {
+      // eslint-disable-next-line
+      const { password, location, ...rest } = r;
+      return rest;
+    });
+
+    return payload;
   }
 }
