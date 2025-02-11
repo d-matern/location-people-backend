@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
 import { UsersService } from 'src/users/users.service';
+import { SignUpDto } from './dto/sign-up.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,14 +12,16 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  async signUp(username: string, password: string, age: number) {
-    const existingUser = await this.getUser(username);
+  async signUp(data: SignUpDto) {
+    const existingUser = await this.getUser(data.username);
     if (existingUser) {
       throw new UnauthorizedException('Username already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await this.usersService.create(username, hashedPassword, age);
+    // eslint-disable-next-line
+    const { password, ...rest } = data;
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    await this.usersService.create({ ...rest, password: hashedPassword });
     return { message: 'User registered' };
   }
 

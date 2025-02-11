@@ -11,11 +11,7 @@ export class AuthController {
   @Public()
   @Post('register')
   signUp(@Body() signUpDto: SignUpDto) {
-    return this.authService.signUp(
-      signUpDto.username,
-      signUpDto.password,
-      signUpDto.age,
-    );
+    return this.authService.signUp(signUpDto);
   }
 
   @Public()
