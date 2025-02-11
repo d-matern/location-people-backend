@@ -8,7 +8,7 @@ dotenv.config(); // Загружаем переменные окружения
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  migrations: ['dist/migrations/*.js'],
+  migrations: ['dist/src/migrations/*.js'],
   entities: [User],
   logging: true,
 });
