@@ -5,10 +5,13 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
+import * as dotenv from 'dotenv';
+
 import { IS_PUBLIC_KEY } from './auth.decorators';
+
+dotenv.config(); // Загружаем переменные окружения
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -34,7 +37,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
+        secret: process.env.JWT_SECRET,
       });
       // 💡 Здесь мы назначаем полезную нагрузку объекту запроса
       // чтобы мы могли получить к нему доступ в наших обработчиках маршрутов

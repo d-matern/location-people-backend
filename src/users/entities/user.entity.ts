@@ -11,11 +11,17 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: '' })
-  avatar: string;
+  @Column()
+  firstName: string;
 
   @Column()
-  age: number;
+  lastName: string;
+
+  @Column()
+  gender: string;
+
+  @Column({ type: 'date' })
+  birthDate: Date;
 
   @Column({
     type: 'geography',
@@ -24,4 +30,19 @@ export class User {
     default: () => `ST_GeomFromText('POINT(0 0)', 4326)`,
   })
   location: Point;
+
+  @Column({ nullable: true })
+  avatar: string;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  vk: string;
+
+  @Column({ nullable: true })
+  instagram: string;
+
+  @Column({ nullable: true })
+  telegram: string;
 }
