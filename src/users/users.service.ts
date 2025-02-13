@@ -2,21 +2,21 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { SignUpDto } from 'src/auth/dto/sign-up.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
   ) {}
 
-  findOne(username: string): Promise<User | null> {
+  findOne(username: string): Promise<UserEntity | null> {
     return this.userRepository.findOneBy({ username });
   }
 
-  create(data: SignUpDto): Promise<User> {
+  create(data: SignUpDto): Promise<UserEntity> {
     const newUser = this.userRepository.create(data);
     return this.userRepository.save(newUser);
   }
@@ -42,7 +42,7 @@ export class UsersService {
     }
 
     // eslint-disable-next-line
-    const { password, location, ...profile } = result[0];
+    const { password, location, socketId, ...profile } = result[0];
     return profile;
   }
 }
