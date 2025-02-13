@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/entities/user.entity';
+import { UserEntity } from './users/entities/user.entity';
 import { LocationModule } from './location/location.module';
 import { UsersModule } from './users/users.module';
 import { WebSocketModule } from './websocket/websocket.module';
@@ -14,11 +14,11 @@ import { WebSocketModule } from './websocket/websocket.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       migrations: ['dist/src/migrations/*.js'],
-      entities: [User],
+      entities: [UserEntity],
       synchronize: false,
-      logging: true,
+      logging: false,
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([UserEntity]),
     AuthModule,
     UsersModule,
     LocationModule,
