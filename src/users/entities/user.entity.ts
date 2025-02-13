@@ -1,7 +1,7 @@
 import { Column, Entity, Point, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -30,6 +30,9 @@ export class User {
     default: () => `ST_GeomFromText('POINT(0 0)', 4326)`,
   })
   location: Point;
+
+  @Column({ default: false })
+  isOnline: boolean;
 
   @Column({ nullable: true })
   avatar: string;

@@ -17,29 +17,47 @@ dotenv.config();
   },
 })
 export class LocationGateway {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() io: Server;
+
+  private activeUsers: Record<string, LocationDto> = {};
 
   constructor(private readonly locationService: LocationService) {}
 
-  handleConnection(client: Socket) {
-    console.log(`A user connected: ${client.id}`);
+  handleConnection(socket: Socket) {
+    console.log(`A user connected: ${socket.id}`);
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(`User disconnected: ${client.id}`);
+  async handleDisconnect(socket: Socket) {
+    console.log(`User disconnected: ${socket.id}`);
+
+    if (this.activeUsers[socket.id]) {
+      await this.locationService.updateUserStatus(
+        this.activeUsers[socket.id].userId,
+      );
+      delete this.activeUsers[socket.id];
+    }
+    this.broadcastNearbyUsers();
   }
 
   @SubscribeMessage('updateLocation')
   async handleUpdateLocation(@MessageBody() data: LocationDetectDto) {
     await this.locationService.updateUserLocation(data);
+    this.activeUsers[data.socketId] = data;
+    this.broadcastNearbyUsers();
   }
 
-  @SubscribeMessage('nearbyUsers')
-  async handleNearbyUsers(@MessageBody() data: LocationDto) {
+  private async handleNearbyUsers(data: LocationDto) {
     const nearbyUsers = await this.locationService.getNearbyUsers(
       data.userId,
       data.radius,
     );
     return nearbyUsers;
+  }
+
+  private async broadcastNearbyUsers() {
+    Object.keys(this.activeUsers).forEach(async (key) => {
+      const users = await this.handleNearbyUsers(this.activeUsers[key]);
+      this.io.to(key).emit('nearbyUsers', users);
+    });
   }
 }
