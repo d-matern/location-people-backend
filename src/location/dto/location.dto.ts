@@ -6,5 +6,4 @@ export class LocationDto {
 export class LocationDetectDto extends LocationDto {
   lat: number;
   lng: number;
-  socketId: string;
 }
