@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
@@ -40,9 +41,9 @@ export class LocationGateway {
   }
 
   @SubscribeMessage('updateLocation')
-  async handleUpdateLocation(@MessageBody() data: LocationDetectDto) {
+  async handleUpdateLocation(@MessageBody() data: LocationDetectDto, @ConnectedSocket() socket: Socket) {
     await this.locationService.updateUserLocation(data);
-    this.activeUsers[data.socketId] = data;
+    this.activeUsers[socket.id] = data;
     this.broadcastNearbyUsers();
   }
 
