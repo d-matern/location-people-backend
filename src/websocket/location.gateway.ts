@@ -30,21 +30,23 @@ export class LocationGateway {
 
   async handleDisconnect(socket: Socket) {
     console.log(`User disconnected: ${socket.id}`);
-
-    if (this.activeUsers[socket.id]) {
-      await this.locationService.updateUserStatus(
-        this.activeUsers[socket.id].userId,
-      );
-      delete this.activeUsers[socket.id];
-    }
-    this.broadcastNearbyUsers();
+    this.refreshActiveUsers(socket.id);
   }
 
   @SubscribeMessage('updateLocation')
-  async handleUpdateLocation(@MessageBody() data: LocationDetectDto, @ConnectedSocket() socket: Socket) {
+  async handleUpdateLocation(
+    @MessageBody() data: LocationDetectDto,
+    @ConnectedSocket() socket: Socket,
+  ) {
     await this.locationService.updateUserLocation(data);
     this.activeUsers[socket.id] = data;
     this.broadcastNearbyUsers();
+  }
+
+  @SubscribeMessage('unsubscribeNearbyUsers')
+  async handleUnsubscribeNearbyUsers(@ConnectedSocket() socket: Socket) {
+    console.log(`User unsubscribe NearbyUsers: ${socket.id}`);
+    this.refreshActiveUsers(socket.id);
   }
 
   private async handleNearbyUsers(data: LocationDto) {
@@ -60,5 +62,15 @@ export class LocationGateway {
       const users = await this.handleNearbyUsers(this.activeUsers[key]);
       this.io.to(key).emit('nearbyUsers', users);
     });
+  }
+
+  private async refreshActiveUsers(socketId: string) {
+    if (this.activeUsers[socketId]) {
+      await this.locationService.updateUserStatus(
+        this.activeUsers[socketId].userId,
+      );
+      delete this.activeUsers[socketId];
+    }
+    this.broadcastNearbyUsers();
   }
 }
