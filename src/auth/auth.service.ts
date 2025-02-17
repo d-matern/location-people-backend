@@ -21,8 +21,11 @@ export class AuthService {
     // eslint-disable-next-line
     const { password, ...rest } = data;
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    await this.usersService.create({ ...rest, password: hashedPassword });
-    return { message: 'User registered' };
+    const newUser = await this.usersService.create({
+      ...rest,
+      password: hashedPassword,
+    });
+    return await this.createToken(newUser.id, newUser.username);
   }
 
   async signIn(username: string, pass: string) {
@@ -36,13 +39,17 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = { sub: user.id, username: user.username };
-    return {
-      token: await this.jwtService.signAsync(token),
-    };
+    return await this.createToken(user.id, user.username);
   }
 
   private async getUser(username: string) {
     return await this.usersService.findOne(username);
+  }
+
+  private async createToken(userId: number, username: string) {
+    const token = { sub: userId, username: username };
+    return {
+      token: await this.jwtService.signAsync(token),
+    };
   }
 }
