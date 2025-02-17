@@ -45,4 +45,15 @@ export class UsersService {
     const { password, location, socketId, ...profile } = result[0];
     return profile;
   }
+
+  async deleteProfile(id: number) {
+    const result = await this.userRepository.query(
+      'DELETE FROM users WHERE id = $1;',
+      [id],
+    );
+
+    if (!result || result.length === 0) {
+      throw new BadRequestException();
+    }
+  }
 }
